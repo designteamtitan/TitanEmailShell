@@ -2,19 +2,628 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Hello World</title>
+<title>Inbox (367) - Mail</title>
 <style>
+  * { box-sizing: border-box; }
   html, body {
-    height: 100%;
     margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #e0e0e0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  img { display: block; }
+
+  .body {
+    background: #eeedee;
+    width: 1920px;
+    height: 963px;
+    display: flex;
+    align-items: flex-start;
+    overflow: hidden;
+  }
+  .body-inner {
+    background: #eeedee;
+    flex: 1654 0 0;
+    height: 100%;
+  }
+  .center-row {
+    background: #eeedee;
+    height: 963px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 16px 80px 16px 24px;
+    overflow: hidden;
+  }
+
+  /* Main card */
+  .card {
+    background: #fff;
+    width: 1440px;
+    height: 931px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 16px 0px rgba(0,0,0,0.08), 0px 1px 3px 0px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Top bar */
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid #f4f5f8;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    flex-shrink: 0;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .icon-btn {
+    width: 34px; height: 34px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-btn img { width: 16px; height: 16px; }
+  .new-email-btn {
+    background: #2170f4;
+    height: 34px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+  }
+  .new-email-main {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px 0 14px;
+  }
+  .new-email-main img { width: 14px; height: 14px; }
+  .new-email-main span {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.076px;
+    white-space: nowrap;
+  }
+  .new-email-caret {
+    border-left: 1.5px solid rgba(255,255,255,0.35);
+    height: 34px;
+    width: 27px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: sans-serif;
   }
+  .new-email-caret img { width: 9px; height: 5.086px; }
+
+  .search-box {
+    background: #f4f5f8;
+    height: 34px;
+    width: 320px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+  }
+  .search-box img { width: 13.45px; height: 14px; opacity: 0.5; }
+  .search-box span {
+    color: #80868b;
+    font-size: 13px;
+    letter-spacing: -0.076px;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .topbar-right .icon-btn { width: 40px; height: 40px; border-radius: 4px; }
+  .topbar-right .icon-btn img { width: 18px; height: 18px; }
+  .topbar-right .icon-btn img.archive-icon { width: 18px; height: 13.9px; }
+  .topbar-right .icon-btn img.settings-icon { width: 16px; height: 16px; }
+
+  /* Main content row */
+  .content-row {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Left sidebar (mail list) */
+  .mail-list-panel {
+    background: #fff;
+    border-right: 1px solid #f4f5f8;
+    width: 440px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 9px 8px 8px;
+    overflow: hidden;
+  }
+  .filter-row {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px 0 9px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .filter-row .menu-icon {
+    width: 14px; height: 14px; opacity: 0.5; margin: 0 8px 0 12px;
+  }
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding-left: 4px;
+  }
+  .filter-tab {
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 14px;
+    letter-spacing: -0.15px;
+    white-space: nowrap;
+  }
+  .filter-tab.active {
+    background: #eff6ff;
+    color: #2170f4;
+    font-weight: 600;
+  }
+  .filter-tab.inactive {
+    color: #666;
+    font-weight: 500;
+  }
+  .all-mails-dropdown {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: #fff;
+    border: 1px solid #dedede;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 11px;
+  }
+  .all-mails-dropdown span {
+    font-size: 14px;
+    color: #333;
+    letter-spacing: -0.15px;
+    white-space: nowrap;
+  }
+  .all-mails-dropdown img { width: 10px; height: 5px; }
+
+  .mail-list {
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+    padding: 4px 8px 0;
+  }
+  .mail-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px 14px 13px;
+    border-radius: 8px;
+    margin-bottom: 0;
+  }
+  .mail-item.unread { background: #eff6ff; }
+  .mail-item .indicators {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 14px;
+    flex-shrink: 0;
+    padding-top: 3px;
+  }
+  .mail-item .indicators img { width: 14px; height: 14px; opacity: 0.5; }
+  .mail-item.unread .indicators img { opacity: 0.8; }
+  .unread-dot {
+    width: 7px; height: 7px;
+    border-radius: 3.5px;
+    background: #2170f4;
+  }
+  .mail-item .content { flex: 1; min-width: 0; }
+  .mail-item .row1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .mail-item .sender {
+    font-size: 15px;
+    letter-spacing: -0.234px;
+    color: #1a1a1a;
+  }
+  .mail-item.unread .sender { font-weight: 600; }
+  .mail-item .time {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.065px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .mail-item .subject {
+    font-size: 14px;
+    color: #333;
+    letter-spacing: -0.15px;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mail-item.unread .subject { font-weight: 600; }
+  .mail-item .preview {
+    font-size: 14px;
+    color: #666;
+    letter-spacing: -0.15px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Right panel: email thread */
+  .thread-panel {
+    width: 1000px;
+    height: 100%;
+    overflow-y: auto;
+  }
+  .thread-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 24px 0;
+  }
+  .thread-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    max-width: 802px;
+  }
+  .thread-actions { display: flex; align-items: center; gap: 2px; }
+  .thread-actions .icon-btn { width: 32px; height: 32px; border-radius: 4px; }
+  .thread-actions .icon-btn img { width: 16px; height: 16px; }
+  .thread-actions .icon-btn img.archive-icon { width: 14.19px; height: 16px; }
+  .thread-actions .icon-btn img.delete-icon { width: 13.39px; height: 16px; }
+  .thread-actions .icon-btn img.star-icon { width: 16px; height: 15.31px; }
+  .thread-actions .icon-btn img.more-icon { width: 13.75px; height: 2.75px; }
+
+  .msg {
+    margin: 0 24px;
+    border: 1px solid #f4f5f8;
+    border-radius: 8px;
+    margin-top: 26px;
+  }
+  .msg-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 24px 12px;
+  }
+  .msg-sender-block { display: flex; flex-direction: column; }
+  .msg-sender { font-size: 15px; color: #333; }
+  .msg-to { font-size: 14px; color: #888; margin-top: 2px; }
+  .msg-preview { font-size: 14px; color: #888; }
+  .msg-meta { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .msg-date { font-size: 12px; color: #888; white-space: nowrap; }
+
+  .msg-collapsed .msg-header { align-items: center; }
+  .msg-collapsed .msg-preview { max-width: 692px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .older-messages-row {
+    margin: 0 24px;
+    padding: 16px 0;
+    display: flex;
+    justify-content: center;
+  }
+  .older-messages-btn {
+    font-size: 13px;
+    color: #666;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: default;
+  }
+
+  .msg-body {
+    padding: 0 24px 20px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #333;
+  }
+  .msg-body p { margin: 0 0 20px; }
+  .msg-body p:last-child { margin-bottom: 0; }
+
+  .reply-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 20px 16px;
+    border-top: 1px solid #f4f5f8;
+  }
+  .reply-btn {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 8px 4px 4px;
+    border-radius: 4px;
+  }
+  .reply-btn .icon-wrap { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .reply-btn img.reply-icon { width: 13.72px; height: 11.16px; }
+  .reply-btn img.reply-all-icon { width: 16px; height: 11.15px; }
+  .reply-btn img.forward-icon { width: 15.16px; height: 13.16px; }
+  .reply-btn span {
+    font-size: 14px;
+    color: #333;
+    letter-spacing: -0.15px;
+    white-space: nowrap;
+  }
+  .reply-with-ai {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .reply-with-ai img { width: 24px; height: 24px; }
+
+  /* Right icon rail */
+  .right-rail {
+    width: 56px;
+    height: 931px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 0 12px;
+  }
+  .rail-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rail-icon img.tasks { width: 20px; height: 20px; }
+  .rail-icon img.calendar { width: 28px; height: 28px; }
 </style>
 </head>
 <body>
-  <h1>Hello World</h1>
+
+<div class="body">
+  <div class="body-inner">
+    <div class="center-row">
+      <div class="card">
+
+        <!-- Top bar -->
+        <div class="topbar">
+          <div class="topbar-left">
+            <div class="icon-btn"><img src="assets/image-inbox.svg" alt=""></div>
+            <div class="new-email-btn">
+              <div class="new-email-main">
+                <img src="assets/image.svg" alt="">
+                <span>New email</span>
+              </div>
+              <div class="new-email-caret"><img src="assets/down.svg" alt=""></div>
+            </div>
+          </div>
+          <div class="search-box">
+            <img src="assets/group9.svg" alt="">
+            <span>Search in ella@avontech.com</span>
+          </div>
+          <div class="topbar-right">
+            <div class="icon-btn"><img class="archive-icon" src="assets/union.svg" alt=""></div>
+            <div class="icon-btn"><img class="settings-icon" src="assets/image1.svg" alt=""></div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content-row">
+
+          <!-- Mail list -->
+          <div class="mail-list-panel">
+            <div class="filter-row">
+              <img class="menu-icon" src="assets/group1.svg" alt="">
+              <div class="filter-tabs">
+                <div class="filter-tab active">Priority (25)</div>
+                <div class="filter-tab inactive">Other (50)</div>
+              </div>
+              <div class="all-mails-dropdown">
+                <span>All mails</span>
+                <img src="assets/group2.svg" alt="">
+              </div>
+            </div>
+
+            <div class="mail-list">
+              <div class="mail-item">
+                <div class="indicators"><img src="assets/group1.svg" alt=""></div>
+                <div class="content">
+                  <div class="row1">
+                    <span class="sender">Sajal Kumar</span>
+                    <span class="time">10:45 am</span>
+                  </div>
+                  <div class="subject">Feedback on grammar and spell check</div>
+                  <div class="preview">Looking for a change? How does working on Meatvedcdv...</div>
+                </div>
+              </div>
+
+              <div class="mail-item unread">
+                <div class="indicators">
+                  <img src="assets/group1.svg" alt="">
+                  <div class="unread-dot"></div>
+                </div>
+                <div class="content">
+                  <div class="row1">
+                    <span class="sender">Ninad Raval</span>
+                    <span class="time">11:20 am</span>
+                  </div>
+                  <div class="subject">Project roadmap for Dashboard version</div>
+                  <div class="preview">Looking for a change? How does working on Meatvedcdv...</div>
+                </div>
+              </div>
+
+              <div class="mail-item">
+                <div class="indicators"><img src="assets/group1.svg" alt=""></div>
+                <div class="content">
+                  <div class="row1">
+                    <span class="sender">David Jones, Ella (2)</span>
+                    <span class="time">12:15 pm</span>
+                  </div>
+                  <div class="subject">Flock Terms and Condition</div>
+                  <div class="preview">We need to get on a meeting for the discuss our T&amp;...</div>
+                </div>
+              </div>
+
+              <div class="mail-item">
+                <div class="indicators"><img src="assets/group1.svg" alt=""></div>
+                <div class="content">
+                  <div class="row1">
+                    <span class="sender">Shreya</span>
+                    <span class="time">1:30 pm</span>
+                  </div>
+                  <div class="subject">Feedback on snooze feature</div>
+                  <div class="preview">I like the design that you have made. Probably we ...</div>
+                </div>
+              </div>
+
+              <div class="mail-item">
+                <div class="indicators"><img src="assets/group1.svg" alt=""></div>
+                <div class="content">
+                  <div class="row1">
+                    <span class="sender">Sajal Kumar</span>
+                    <span class="time">2:45 pm</span>
+                  </div>
+                  <div class="subject">Feedback on link and file tracking feature</div>
+                  <div class="preview">Hi, Ella can you please review these mocks.</div>
+                </div>
+              </div>
+
+              <div class="mail-item">
+                <div class="indicators"><img src="assets/group1.svg" alt=""></div>
+                <div class="content">
+                  <div class="row1">
+                    <span class="sender">Ninad Raval</span>
+                    <span class="time">3:10 pm</span>
+                  </div>
+                  <div class="subject">Lets schedule our 1:1 sometime</div>
+                  <div class="preview">Hi Ella, we should schedule a 1:1 session next wee...</div>
+                </div>
+              </div>
+
+              <div class="mail-item">
+                <div class="indicators"><img src="assets/group1.svg" alt=""></div>
+                <div class="content">
+                  <div class="row1">
+                    <span class="sender">Ninad Raval</span>
+                    <span class="time">Yesterday</span>
+                  </div>
+                  <div class="subject">Lets schedule our 1:1 sometime</div>
+                  <div class="preview">Hi Ella, we should schedule a 1:1 session next wee...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thread panel -->
+          <div class="thread-panel">
+            <div class="thread-header">
+              <div class="thread-title">Project roadmap for Dashboard version 2</div>
+              <div class="thread-actions">
+                <div class="icon-btn"><img class="archive-icon" src="assets/image-archive.svg" alt=""></div>
+                <div class="icon-btn"><img class="delete-icon" src="assets/group3.svg" alt=""></div>
+                <div class="icon-btn"><img class="star-icon" src="assets/group4.svg" alt=""></div>
+                <div class="icon-btn"><img class="more-icon" src="assets/group7.svg" alt=""></div>
+              </div>
+            </div>
+
+            <div class="msg msg-collapsed">
+              <div class="msg-header">
+                <div class="msg-sender-block">
+                  <span class="msg-sender">David Eglasias</span>
+                </div>
+                <span class="msg-preview">And as such the media have been very influential in shaping the way the society is heading into chaos of ...</span>
+                <div class="msg-meta">
+                  <img src="assets/icon24-px.svg" alt="" style="width:16.67px;height:9.17px;">
+                  <span class="msg-date">Jun 3</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="older-messages-row">
+              <div class="older-messages-btn">Show 7 older messages</div>
+            </div>
+
+            <div class="msg msg-collapsed">
+              <div class="msg-header">
+                <div class="msg-sender-block">
+                  <span class="msg-sender">Louis Litt</span>
+                </div>
+                <span class="msg-preview">Checking in on the status of the new dashboard designs.</span>
+                <div class="msg-meta">
+                  <span class="msg-date">Jun 9</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="msg">
+              <div class="msg-header">
+                <div class="msg-sender-block">
+                  <span class="msg-sender" style="font-weight:600;">Ninad Raval</span>
+                  <span class="msg-to">To: me, Sajal, Viral</span>
+                </div>
+                <div class="msg-meta">
+                  <span class="msg-date">Jun 12</span>
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="display:flex;align-items:center;gap:2px;">
+                      <img src="assets/rr.svg" alt="" style="width:16px;height:12.35px;">
+                      <span style="font-size:12px;color:#888;">4</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:2px;">
+                      <img src="assets/icon24-px1.svg" alt="" style="width:12.27px;height:6.75px;">
+                      <span style="font-size:12px;color:#888;">4</span>
+                    </div>
+                    <img src="assets/expand.svg" alt="" style="width:15.89px;height:15.89px;">
+                    <img src="assets/image2.svg" alt="" style="width:13.72px;height:11.16px;">
+                    <img src="assets/group8.svg" alt="" style="width:24px;height:4.8px;">
+                  </div>
+                </div>
+              </div>
+              <div class="msg-body">
+                <p>Hey,</p>
+                <p>Since the last time we met, I have been working on the new dashboard version. Here's a quick summary of the key updates:</p>
+                <p>1. Introducing multiple themes<br>2. Improvements in accessibility</p>
+                <p>Thanks!</p>
+              </div>
+              <div class="reply-row">
+                <div class="reply-btn">
+                  <div class="icon-wrap"><img class="reply-icon" src="assets/reply-image.svg" alt=""></div>
+                  <span>Reply</span>
+                </div>
+                <div class="reply-btn">
+                  <div class="icon-wrap"><img class="reply-all-icon" src="assets/reply-all-union.svg" alt=""></div>
+                  <span>Reply all</span>
+                </div>
+                <div class="reply-btn">
+                  <div class="icon-wrap"><img class="forward-icon" src="assets/forward-image.svg" alt=""></div>
+                  <span>Forward</span>
+                </div>
+                <div class="reply-with-ai">
+                  <img src="assets/reply-ai-subtract.svg" alt="">
+                  <span>Reply with AI</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right icon rail -->
+  <div class="right-rail">
+    <div class="rail-icon"><img class="tasks" src="assets/rail-tasks.svg" alt=""></div>
+    <div class="rail-icon"><img class="calendar" src="assets/rail-calendar-frame.svg" alt=""></div>
+  </div>
+</div>
+
 </body>
 </html>
